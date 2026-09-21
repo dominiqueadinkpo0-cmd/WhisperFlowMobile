@@ -17,7 +17,7 @@ class BootReceiver : BroadcastReceiver() {
             a == "android.intent.action.QUICKBOOT_POWERON") {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    if (context.prefsFlow().let { first(it).overlayEnabled }) {
+                    if (context.prefsFlow().first().overlayEnabled) {
                         val i = Intent(context, MicService::class.java)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                             context.startForegroundService(i)

@@ -11,6 +11,7 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Toast
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 
 /**
  * Coeur de FlowMic : affiche le micro flottant et injecte le texte dicté
@@ -32,15 +33,12 @@ class FlowService : AccessibilityService() {
         overlay = MicOverlay(this)
         scope.launch {
             try {
-                if (first(prefsFlow()).overlayEnabled) tryShowOverlay()
+                if (prefsFlow().first().overlayEnabled) tryShowOverlay()
             } catch (e: Exception) {
                 Log.w(TAG, "prefs read failed", e)
             }
         }
     }
-
-    private suspend fun <T> first(flow: kotlinx.coroutines.flow.Flow<T>): T =
-        kotlinx.coroutines.flow.first(flow)
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {}
     override fun onInterrupt() {}
@@ -68,7 +66,7 @@ class FlowService : AccessibilityService() {
 
     fun onDictated(rawText: String) {
         scope.launch {
-            val prefs = try { first(prefsFlow()) } catch (_: Exception) { AppPrefs() }
+            val prefs = try { prefsFlow().first() } catch (_: Exception) { AppPrefs() }
             var text = rawText.trim()
             if (text.isEmpty()) return@launch
             if (prefs.autoSpace) text = " $text"

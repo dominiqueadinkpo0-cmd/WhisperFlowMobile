@@ -10,6 +10,7 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import org.json.JSONObject
 import java.io.*
 
@@ -119,7 +120,7 @@ class Transcriber(
         if (!f.exists() || f.length() < 800) return
         scope.launch(Dispatchers.IO) {
             try {
-                val prefs = kotlinx.coroutines.flow.first(ctx.prefsFlow())
+                val prefs = ctx.prefsFlow().first()
                 val text = transcribeWhisper(f, prefs.apiKey, prefs.language)
                 withContext(Dispatchers.Main) { if (text.isNotBlank()) onResult(text) }
             } catch (e: Exception) {

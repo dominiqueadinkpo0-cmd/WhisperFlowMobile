@@ -15,6 +15,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 
 /**
  * Bouton micro flottant : déplaçable, visible par-dessus toutes les apps.
@@ -40,7 +41,7 @@ class MicOverlay(private val ctx: Context) {
             resetIcon()
         }
         scope.launch {
-            val prefs = kotlinx.coroutines.flow.first(ctx.prefsFlow())
+            val prefs = ctx.prefsFlow().first()
             createButton(prefs)
         }
     }
@@ -100,7 +101,7 @@ class MicOverlay(private val ctx: Context) {
             setRecording(true)
             vibrate(30)
             scope.launch {
-                val p = kotlinx.coroutines.flow.first(ctx.prefsFlow())
+                val p = ctx.prefsFlow().first()
                 transcriber?.start(p.mode, p.language, p.apiKey)
             }
         }
@@ -141,7 +142,7 @@ class MicOverlay(private val ctx: Context) {
                             setRecording(true)
                             vibrate(20)
                             scope.launch {
-                                val p = kotlinx.coroutines.flow.first(ctx.prefsFlow())
+                                val p = ctx.prefsFlow().first()
                                 transcriber?.start(p.mode, p.language, p.apiKey)
                             }
                             handler.postDelayed({
